@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainFragment">
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="24dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.60" />
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textField"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+
+            android:hint="@string/label"
+            app:layout_constraintBottom_toBottomOf="parent"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="?attr/shapeAppearanceLargeComponent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/city_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/textview_first"
+        style="@style/Widget.Material3.CardView.Filled"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="24dp"
+        android:checkable="true"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/icon"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:contentDescription="@string/content_description" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="test" />
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="test" />
+
+                <TextView
+                    android:id="@+id/des"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="test" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
