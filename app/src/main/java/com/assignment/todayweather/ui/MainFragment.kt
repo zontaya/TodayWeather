@@ -1,9 +1,11 @@
 package com.assignment.todayweather.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -13,7 +15,6 @@ import com.assignment.todayweather.R
 import com.assignment.todayweather.data.remote.model.Forecast
 import com.assignment.todayweather.data.remote.model.UiResponse
 import com.assignment.todayweather.databinding.FragmentMainBinding
-import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -58,9 +59,8 @@ class MainFragment : Fragment() {
         binding.buttonSearch.setOnClickListener {
             if (binding.cityName.text.toString().trim().isNotEmpty()) {
                 mainViewModel.search(binding.cityName.text.toString().trim(), unitsPos)
-
-                binding.cityName.text?.clear()
-                binding.cardLayout.requestFocus();
+                val inputManager =  requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputManager.hideSoftInputFromWindow(view.windowToken, 0);
             }
         }
         binding.cardLayout.setOnClickListener {
