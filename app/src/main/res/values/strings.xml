@@ -2,8 +2,8 @@
     <string name="app_name">Today Weather</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="main_fragment_label">Main Fragment</string>
+    <string name="detail_fragment_label">Detail Fragment</string>
     <string name="search">Search</string>
     <string name="previous">Previous</string>
 
@@ -14,6 +14,7 @@
     <string name="content_description">contentDescription</string>
     <string name="temp">%1$s  %2$s</string>
     <string name="temp_dt">%1$s : %2$s</string>
+    <string name="temp_detail_dt">%1$s  %2$s:%3$s</string>
     <string name="temp_title">%1$s , %2$s</string>
     <string name="temp_humidity">humidity: %1$s %2$s</string>
     <string name="temp_feels_like">feels like: %1$s %2$s </string>

@@ -3,26 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/main_fragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
+        android:id="@+id/main_fragment"
         android:name="com.assignment.todayweather.ui.MainFragment"
-        android:label="@string/first_fragment_label"
+        android:label="@string/main_fragment_label"
         tools:layout="@layout/fragment_main">
-
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_main_to_detail"
+            app:destination="@id/detail_fragment" />
     </fragment>
-    <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.assignment.todayweather.ui.DetailFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
 
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+    <fragment
+        android:id="@+id/detail_fragment"
+        android:name="com.assignment.todayweather.ui.DetailFragment"
+        android:label="@string/detail_fragment_label"
+        tools:layout="@layout/fragment_detail">
+
+        <argument
+            android:name="lat"
+            android:defaultValue="0.0"
+            app:argType="string" />
+        <argument
+            android:name="lon"
+            android:defaultValue="0.0"
+            app:argType="string" />
+        <argument
+            android:name="units"
+            android:defaultValue="metric"
+            app:argType="string" />
+
     </fragment>
 </navigation>

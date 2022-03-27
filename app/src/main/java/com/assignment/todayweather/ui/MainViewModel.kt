@@ -7,6 +7,8 @@ import com.assignment.todayweather.data.remote.model.Forecast
 import com.assignment.todayweather.data.remote.model.UiResponse
 import com.assignment.todayweather.domain.interactors.SearchCityParams
 import com.assignment.todayweather.domain.interactors.SearchCityUseCase
+import com.assignment.todayweather.util.Constants.UNITS_IMPERIAL
+import com.assignment.todayweather.util.Constants.UNITS_METRIC
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -18,10 +20,7 @@ class MainViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val searchCityUseCase: SearchCityUseCase
 ) : ViewModel() {
-    companion object {
-        const val UNITS_METRIC = "metric"
-        const val UNITS_IMPERIAL = "imperial"
-    }
+
 
     val data = MutableStateFlow<UiResponse<Forecast>>(UiResponse.Idle)
     var unit: Int = 0
@@ -30,13 +29,13 @@ class MainViewModel(
         getTemp()
     }
 
-    fun search(name: String, i: Int) = viewModelScope.launch {
-
+    fun search(name: String, i: Int) = viewModelScope.launch(IO) {
         data.emit(UiResponse.Loading)
         val param =
             SearchCityParams(name = name, units = if (i == 0) UNITS_METRIC else UNITS_IMPERIAL)
         searchCityUseCase.execute(param)
-            .flowOn(IO).catch { e ->
+            .flowOn(IO)
+            .catch { e ->
                 data.emit(UiResponse.Error(e.message))
             }
             .distinctUntilChanged()

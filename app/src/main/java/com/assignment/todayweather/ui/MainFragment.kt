@@ -1,20 +1,25 @@
 package com.assignment.todayweather.ui
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.assignment.todayweather.R
 import com.assignment.todayweather.data.remote.model.Forecast
 import com.assignment.todayweather.data.remote.model.UiResponse
 import com.assignment.todayweather.databinding.FragmentMainBinding
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.android.ext.android.inject
@@ -43,7 +48,7 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.cityName.setText("bangkok")
         binding.unitsAuto.setOnItemClickListener { _, _, i, _ ->
             unitsPos = i
             if (binding.cityName.text.toString().trim().isNotEmpty()) {
@@ -53,23 +58,47 @@ class MainFragment : Fragment() {
         binding.buttonSearch.setOnClickListener {
             if (binding.cityName.text.toString().trim().isNotEmpty()) {
                 mainViewModel.search(binding.cityName.text.toString().trim(), unitsPos)
+
+                binding.cityName.text?.clear()
+                binding.cardLayout.requestFocus();
             }
         }
-//        binding.buttonSearch.setOnClickListener {
-//            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-//        }
+        binding.cardLayout.setOnClickListener {
+            lifecycleScope.launch {
+                mainViewModel.data.map {
+                    it as UiResponse.Success
+                    it.data.coord
+                }.catch { e ->
+                    println(e.message)
+                }.collectLatest {
+                    findNavController().navigate(
+                        MainFragmentDirections.actionMainToDetail(
+                            it.lat.toString(),
+                            it.lon.toString(),
+                            if (unitsPos == 0) "metric" else "imperial"
+                        )
+                    )
+                }
+            }
 
-        lifecycleScope.launchWhenResumed {
+
+        }
+
+        lifecycleScope.launchWhenStarted{
 
             mainViewModel.data.collect { response ->
                 when (response) {
                     is UiResponse.Error -> {
-
+                        Toast.makeText(requireContext(), response.message.toString(), Toast.LENGTH_LONG).show()
                     }
                     UiResponse.Idle -> {
                         binding.cardLayout.visibility = View.INVISIBLE
                     }
                     is UiResponse.Success -> {
+
+                        response.data.coord.lat
+                        response.data.coord.lon
+
                         binding.cardLayout.visibility = View.VISIBLE
                         setCountry(response)
                         serDatetime(response)
@@ -96,25 +125,16 @@ class MainFragment : Fragment() {
 
     private fun serDatetime(response: UiResponse.Success<Forecast>) {
         val dt = convertDate(response.data.dt)
-        var hour = "${dt.hour}"
-
-        if (dt.hour < 10) {
-            hour = "0${dt.hour}"
-        }
-        val time = String.format(
-            getString(R.string.temp_dt),
-            hour, dt.minute.toString()
-        )
-        binding.tempTime?.text = time
+        binding.tempTime.text = dt
     }
 
     private fun setTemp(response: UiResponse.Success<Forecast>) {
-        val timeRefreshStr = String.format(
+        val temp = String.format(
             getString(R.string.temp),
             response.data.main.temp,
             if (unitsPos == 0) "°C" else "°F"
         )
-        binding.temp.text = timeRefreshStr
+        binding.temp.text = temp
     }
 
     private fun setCountry(response: UiResponse.Success<Forecast>) {
@@ -123,7 +143,7 @@ class MainFragment : Fragment() {
             response.data.name,
             response.data.sys.country
         )
-        binding.cityCounty?.text = timeRefreshStr
+        binding.cityCounty.text = timeRefreshStr
     }
 
     private fun setFeel(response: UiResponse.Success<Forecast>) {
@@ -132,7 +152,7 @@ class MainFragment : Fragment() {
             response.data.main.feels_like, if (unitsPos == 0) "°C" else "°F"
         )
 
-        binding.feel?.text = feel
+        binding.feel.text = feel
     }
 
     private fun setHumidity(response: UiResponse.Success<Forecast>) {
@@ -140,14 +160,13 @@ class MainFragment : Fragment() {
             getString(R.string.temp_humidity),
             response.data.main.humidity, "%"
         )
-        binding.humidity?.text = humidity
+        binding.humidity.text = humidity
     }
 
     private fun setIcon(response: UiResponse.Success<Forecast>) {
         if (response.data.weather.isNotEmpty()) {
             val iconName = response.data.weather[0].icon
-            val url = "http://openweathermap.org/img/wn/$iconName@4x.png"
-            Picasso.get().load(Uri.parse(url)).into(binding.icon)
+            Picasso.get().load(iconName).into(binding.icon)
         }
     }
 
@@ -156,10 +175,18 @@ class MainFragment : Fragment() {
         _binding = null
     }
 
-
-    private fun convertDate(dateInMilliseconds: Long): LocalDateTime {
+    private fun convertDate(dateInMilliseconds: Long): String {
         val tz = TimeZone.currentSystemDefault()
         val currentMoment = Instant.fromEpochSeconds(dateInMilliseconds)
-        return currentMoment.toLocalDateTime(tz)
+        val dt = currentMoment.toLocalDateTime(tz)
+        var minute = "${dt.minute}"
+
+        if (dt.minute < 10) {
+            minute = "0${dt.minute}"
+        }
+        return String.format(
+            getString(R.string.temp_dt),
+            dt.hour, minute
+        )
     }
 }

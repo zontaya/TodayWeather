@@ -4,14 +4,15 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
+
 data class ForecastDetail(
     val lat: Double,
     val lon: Double,
     val timezone: String,
     val timezoneOffset: Long,
     val current: Current,
-    val minutely: List<Minutely>,
-    val hourly: List<Current>
+    val hourly: List<Current>,
+    var units: String,
 ) : Parcelable
 
 @Parcelize
@@ -38,10 +39,4 @@ data class Current(
 @Parcelize
 data class Rain(
     val the1H: Double
-) : Parcelable
-
-@Parcelize
-data class Minutely(
-    val dt: Long,
-    val precipitation: Long
 ) : Parcelable

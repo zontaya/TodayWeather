@@ -36,15 +36,7 @@ class ExampleUnitTest : KoinTest {
             name = "bangkok", units = ""
         )
         searchCityUseCase.execute(param).collectLatest {
-            println(it)
-            when (it) {
-                is UiResponse.Success -> {
-                    assertEquals(it.data.name.lowercase(), param.name)
-                }
-                is UiResponse.Error -> {
-                    it.message
-                }
-            }
+            assertEquals(it.name.lowercase(), param.name)
         }
     }
 }

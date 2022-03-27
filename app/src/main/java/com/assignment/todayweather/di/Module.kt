@@ -7,6 +7,7 @@ import com.assignment.todayweather.domain.IRepository
 import com.assignment.todayweather.domain.interactors.GetDailyUseCase
 import com.assignment.todayweather.domain.interactors.SearchCityUseCase
 import com.assignment.todayweather.repository.RepositoryImp
+import com.assignment.todayweather.repository.model.mapper.ApiDetailUiMapper
 import com.assignment.todayweather.repository.model.mapper.ApiUiMapper
 import com.assignment.todayweather.ui.DetailViewModel
 import com.assignment.todayweather.ui.MainViewModel
@@ -23,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 private val viewModelModule = module {
     viewModel { MainViewModel(get(),get()) }
-    viewModel { DetailViewModel(get()) }
+    viewModel { DetailViewModel(get(),get()) }
 
 }
 private val useCaseModule = module {
@@ -32,10 +33,11 @@ private val useCaseModule = module {
 }
 private val mapModule = module {
     factory { ApiUiMapper() }
+    factory { ApiDetailUiMapper() }
 }
 private val commonModule = module {
     single { SavedStateHandle() }
-    single<IRepository> { RepositoryImp(get(), get()) }
+    single<IRepository> { RepositoryImp(get(), get(),get()) }
     single<IRemoteData> { RemoteDataImp(get()) }
     single<Retrofit> {
         val okHttpClientBuilder = OkHttpClient.Builder()
