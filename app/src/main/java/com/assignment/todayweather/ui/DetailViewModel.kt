@@ -10,7 +10,6 @@ import com.assignment.todayweather.domain.interactors.GetDailyUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
@@ -22,6 +21,10 @@ class DetailViewModel(
 ) : ViewModel() {
 
     val detail = MutableStateFlow<UiResponse<ForecastDetail>>(UiResponse.Idle)
+
+    init {
+        getTemp()
+    }
 
     fun getDetail(lat: Double, lon: Double, units: String) = viewModelScope.launch {
         detail.emit(UiResponse.Loading)
