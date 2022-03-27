@@ -1,3 +1,4 @@
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -13,4 +14,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Today Weather"
-include ':app'
+include(":app")
+

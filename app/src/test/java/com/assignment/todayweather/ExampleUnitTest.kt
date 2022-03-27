@@ -2,9 +2,10 @@ package com.assignment.todayweather
 
 
 import com.assignment.todayweather.di.mModules
+import com.assignment.todayweather.domain.interactors.GetDailyParams
+import com.assignment.todayweather.domain.interactors.GetDailyUseCase
 import com.assignment.todayweather.domain.interactors.SearchCityParams
 import com.assignment.todayweather.domain.interactors.SearchCityUseCase
-import com.assignment.todayweather.data.remote.model.UiResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
@@ -21,6 +22,7 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExampleUnitTest : KoinTest {
     private val searchCityUseCase: SearchCityUseCase by inject()
+    private val getDailyUseCase: GetDailyUseCase by inject()
 
     @BeforeTest
     fun setUp() {
@@ -37,6 +39,16 @@ class ExampleUnitTest : KoinTest {
         )
         searchCityUseCase.execute(param).collectLatest {
             assertEquals(it.name.lowercase(), param.name)
+        }
+    }
+
+    @Test
+    fun testGetDaily() = runTest {
+        val param = GetDailyParams(
+            lat = 13.75, lon = 100.5167, exclude = "daily", units = "metric"
+        )
+        getDailyUseCase.execute(param).collectLatest {
+            assertEquals(it.timezone, "Asia/Bangkok")
         }
     }
 }
