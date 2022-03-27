@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class GetDailyUseCase(
     private val repository: IRepository
-) : UseCaseInOut<GetDailyParams, UiResponse<ForecastDetail>> {
-    override suspend fun execute(param: GetDailyParams): Flow<UiResponse<ForecastDetail>> =
+) : UseCaseInOut<GetDailyParams, ForecastDetail> {
+    override suspend fun execute(param: GetDailyParams): Flow<ForecastDetail> =
         repository.getDaily(param)
 }
 

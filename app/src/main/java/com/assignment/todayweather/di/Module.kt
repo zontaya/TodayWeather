@@ -1,12 +1,12 @@
 package com.assignment.todayweather.di
 
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.assignment.todayweather.repository.RepositoryImp
+import androidx.lifecycle.SavedStateHandle
+import com.assignment.todayweather.data.remote.RemoteDataImp
 import com.assignment.todayweather.domain.IRemoteData
 import com.assignment.todayweather.domain.IRepository
-import com.assignment.todayweather.domain.interactors.SearchCityUseCase
-import com.assignment.todayweather.data.remote.RemoteDataImp
 import com.assignment.todayweather.domain.interactors.GetDailyUseCase
+import com.assignment.todayweather.domain.interactors.SearchCityUseCase
+import com.assignment.todayweather.repository.RepositoryImp
 import com.assignment.todayweather.repository.model.mapper.ApiUiMapper
 import com.assignment.todayweather.ui.DetailViewModel
 import com.assignment.todayweather.ui.MainViewModel
@@ -15,14 +15,14 @@ import com.assignment.todayweather.util.Constants.BASE_URL
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
 private val viewModelModule = module {
-    viewModel { MainViewModel(get()) }
+    viewModel { MainViewModel(get(),get()) }
     viewModel { DetailViewModel(get()) }
 
 }
@@ -34,10 +34,14 @@ private val mapModule = module {
     factory { ApiUiMapper() }
 }
 private val commonModule = module {
+    single { SavedStateHandle() }
     single<IRepository> { RepositoryImp(get(), get()) }
     single<IRemoteData> { RemoteDataImp(get()) }
     single<Retrofit> {
         val okHttpClientBuilder = OkHttpClient.Builder()
+        val httpLoggingInterceptor = HttpLoggingInterceptor()
+        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BASIC
+        okHttpClientBuilder.addInterceptor(httpLoggingInterceptor)
         okHttpClientBuilder.addInterceptor { chain ->
             val original = chain.request()
             val originalHttpUrl = original.url

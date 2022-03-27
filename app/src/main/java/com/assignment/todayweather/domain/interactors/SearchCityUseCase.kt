@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class SearchCityUseCase(
     private val repository: IRepository
-) : UseCaseInOut<SearchCityParams, UiResponse<Forecast>> {
-    override suspend fun execute(param: SearchCityParams): Flow<UiResponse<Forecast>> =
+) : UseCaseInOut<SearchCityParams, Forecast> {
+    override suspend fun execute(param: SearchCityParams): Flow<Forecast> =
         repository.searchCity(param)
 }
 

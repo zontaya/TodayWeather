@@ -1,8 +1,10 @@
 package com.assignment.todayweather.data.remote.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-
-data class ForecastDetail (
+@Parcelize
+data class ForecastDetail(
     val lat: Double,
     val lon: Double,
     val timezone: String,
@@ -10,9 +12,10 @@ data class ForecastDetail (
     val current: Current,
     val minutely: List<Minutely>,
     val hourly: List<Current>
-)
+) : Parcelable
 
-data class Current (
+@Parcelize
+data class Current(
     val dt: Long,
     val sunrise: Long? = null,
     val sunset: Long? = null,
@@ -30,13 +33,15 @@ data class Current (
     val weather: List<Weather>,
     val pop: Double? = null,
     val rain: Rain? = null
-)
+) : Parcelable
 
-data class Rain (
+@Parcelize
+data class Rain(
     val the1H: Double
-)
+) : Parcelable
 
-data class Minutely (
+@Parcelize
+data class Minutely(
     val dt: Long,
     val precipitation: Long
-)
+) : Parcelable

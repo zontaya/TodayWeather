@@ -8,6 +8,6 @@ import com.assignment.todayweather.data.remote.model.UiResponse
 import kotlinx.coroutines.flow.Flow
 
 interface IRepository {
-    suspend fun searchCity(param: SearchCityParams): Flow<UiResponse<Forecast>>
-    suspend fun getDaily(param: GetDailyParams): Flow<UiResponse<ForecastDetail>>
+    suspend fun searchCity(param: SearchCityParams): Flow<Forecast>
+    suspend fun getDaily(param: GetDailyParams): Flow<ForecastDetail>
 }
