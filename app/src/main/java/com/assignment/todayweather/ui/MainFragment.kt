@@ -13,7 +13,6 @@ import com.assignment.todayweather.data.remote.model.Forecast
 import com.assignment.todayweather.data.remote.model.UiResponse
 import com.assignment.todayweather.databinding.FragmentMainBinding
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -37,6 +36,7 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -44,11 +44,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, units)
-        binding.unitsAuto?.setAdapter(adapter)
-        binding.unitsAuto?.setText(units[unitsPos], false)
-        binding.unitsAuto?.setOnItemClickListener { _, _, i, _ ->
+        binding.unitsAuto.setOnItemClickListener { _, _, i, _ ->
             unitsPos = i
             if (binding.cityName.text.toString().trim().isNotEmpty()) {
                 mainViewModel.search(binding.cityName.text.toString(), unitsPos)
@@ -62,10 +58,7 @@ class MainFragment : Fragment() {
 //        binding.buttonSearch.setOnClickListener {
 //            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
 //        }
-    }
 
-    override fun onResume() {
-        super.onResume()
         lifecycleScope.launchWhenResumed {
 
             mainViewModel.data.collect { response ->
@@ -74,10 +67,10 @@ class MainFragment : Fragment() {
 
                     }
                     UiResponse.Idle -> {
-                        binding.cardLayout?.visibility = View.INVISIBLE
+                        binding.cardLayout.visibility = View.INVISIBLE
                     }
                     is UiResponse.Success -> {
-                        binding.cardLayout?.visibility = View.VISIBLE
+                        binding.cardLayout.visibility = View.VISIBLE
                         setCountry(response)
                         serDatetime(response)
                         setTemp(response)
@@ -93,11 +86,24 @@ class MainFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, units)
+        unitsPos = mainViewModel.unit
+        binding.unitsAuto.setText(units[unitsPos], false)
+        binding.unitsAuto.setAdapter(adapter)
+    }
+
     private fun serDatetime(response: UiResponse.Success<Forecast>) {
         val dt = convertDate(response.data.dt)
+        var hour = "${dt.hour}"
+
+        if (dt.hour < 10) {
+            hour = "0${dt.hour}"
+        }
         val time = String.format(
             getString(R.string.temp_dt),
-            dt.hour.toString(), dt.minute.toString()
+            hour, dt.minute.toString()
         )
         binding.tempTime?.text = time
     }

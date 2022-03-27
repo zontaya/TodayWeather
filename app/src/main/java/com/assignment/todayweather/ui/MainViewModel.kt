@@ -24,19 +24,14 @@ class MainViewModel(
     }
 
     val data = MutableStateFlow<UiResponse<Forecast>>(UiResponse.Idle)
+    var unit: Int = 0
 
     init {
         getTemp()
     }
 
-    private fun getTemp() = viewModelScope.launch {
-        val temp: Forecast? = savedStateHandle.get("Key")
-        if (temp != null) {
-            data.emit(UiResponse.Success(temp))
-        }
-    }
-    
     fun search(name: String, i: Int) = viewModelScope.launch {
+
         data.emit(UiResponse.Loading)
         val param =
             SearchCityParams(name = name, units = if (i == 0) UNITS_METRIC else UNITS_IMPERIAL)
@@ -47,7 +42,17 @@ class MainViewModel(
             .distinctUntilChanged()
             .collect {
                 savedStateHandle.set("Key", it)
+                savedStateHandle.set("unit", i)
                 data.emit(UiResponse.Success(it))
             }
     }
+
+    private fun getTemp() = viewModelScope.launch {
+        val temp: Forecast? = savedStateHandle.get("Key")
+        unit = savedStateHandle.get("unit") ?: 0
+        if (temp != null) {
+            data.emit(UiResponse.Success(temp))
+        }
+    }
+
 }
