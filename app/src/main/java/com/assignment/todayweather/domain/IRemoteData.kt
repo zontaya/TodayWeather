@@ -15,6 +15,14 @@ interface IRemoteData {
     ): Forecast
 
     @Headers("Content-Type: application/json")
+    @GET("weather")
+    suspend fun searchCityByLocationFromApi(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("units") units: String,
+    ): Forecast
+
+    @Headers("Content-Type: application/json")
     @GET("onecall")
     suspend fun getDailyFromApi(
         @Query("lat") lat: Double,

@@ -42,6 +42,7 @@ val gsonVersion: String by project
 val kotlinDatetimeVersion: String by project
 val constraintLayoutVersion: String by project
 val picassoVersion: String by project
+val dexterVersion: String by project
 dependencies {
     implementation("androidx.core:core-ktx:$androidCoreVersion")
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
@@ -61,7 +62,9 @@ dependencies {
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
     implementation("io.insert-koin:koin-test-junit4:$koinVersion")
     implementation("io.insert-koin:koin-test:$koinVersion")
+    implementation("com.karumi:dexter:$dexterVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+    implementation("com.google.android.gms:play-services-location:19.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")

@@ -1,6 +1,8 @@
 package com.assignment.todayweather.ui
 
+import android.Manifest
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,11 @@ import com.assignment.todayweather.R
 import com.assignment.todayweather.data.remote.model.Forecast
 import com.assignment.todayweather.data.remote.model.UiResponse
 import com.assignment.todayweather.databinding.FragmentMainBinding
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -25,16 +32,13 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.android.ext.android.inject
 
-
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
 class MainFragment : Fragment() {
 
     private var _binding: FragmentMainBinding? = null
     private val units = listOf("Metric : °C", "Imperial : °F")
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by inject()
+    private lateinit var adapter: ArrayAdapter<String>
     private var unitsPos = 0
 
     override fun onCreateView(
@@ -46,21 +50,30 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.cityName.setText("bangkok")
+
         binding.unitsAuto.setOnItemClickListener { _, _, i, _ ->
-            unitsPos = i
+            mainViewModel.setUnits(i)
             if (binding.cityName.text.toString().trim().isNotEmpty()) {
                 mainViewModel.search(binding.cityName.text.toString(), unitsPos)
+            }else{
+                mainViewModel.getLocation(unitsPos)
             }
         }
         binding.buttonSearch.setOnClickListener {
             if (binding.cityName.text.toString().trim().isNotEmpty()) {
                 mainViewModel.search(binding.cityName.text.toString().trim(), unitsPos)
-                val inputManager =  requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val inputManager =
+                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 inputManager.hideSoftInputFromWindow(view.windowToken, 0);
             }
+        }
+        binding.buttonPermission.setOnClickListener {
+            requestPermission()
         }
         binding.cardLayout.setOnClickListener {
             lifecycleScope.launch {
@@ -82,13 +95,21 @@ class MainFragment : Fragment() {
 
 
         }
+        lifecycleScope.launch {
+            mainViewModel.units.collect {
+                unitsPos = it
 
-        lifecycleScope.launchWhenStarted{
-
+            }
+        }
+        lifecycleScope.launchWhenStarted {
             mainViewModel.data.collect { response ->
                 when (response) {
                     is UiResponse.Error -> {
-                        Toast.makeText(requireContext(), response.message.toString(), Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            requireContext(),
+                            response.message.toString(),
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                     UiResponse.Idle -> {
                         binding.cardLayout.visibility = View.INVISIBLE
@@ -112,16 +133,15 @@ class MainFragment : Fragment() {
                 }
             }
         }
+        requestPermission()
     }
 
     override fun onResume() {
         super.onResume()
-        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, units)
-        unitsPos = mainViewModel.unit
-        binding.unitsAuto.setText(units[unitsPos], false)
+        adapter = ArrayAdapter(requireContext(), R.layout.list_item,units)
         binding.unitsAuto.setAdapter(adapter)
+        binding.unitsAuto.setText(units[unitsPos], false)
     }
-
     private fun serDatetime(response: UiResponse.Success<Forecast>) {
         val dt = convertDate(response.data.dt)
         binding.tempTime.text = dt
@@ -187,5 +207,33 @@ class MainFragment : Fragment() {
             getString(R.string.temp_dt),
             dt.hour, minute
         )
+    }
+
+    private fun requestPermission() {
+        Dexter.withContext(requireContext())
+            .withPermissions(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            )
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    report?.let {
+                        if (report.areAllPermissionsGranted()) {
+                            binding.buttonPermission.visibility = View.GONE
+                            mainViewModel.getLocation(unitsPos)
+                        } else {
+                            binding.buttonPermission.visibility = View.VISIBLE
+                        }
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) {
+                    token?.continuePermissionRequest()
+                }
+            })
+            .check()
     }
 }

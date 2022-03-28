@@ -1,10 +1,14 @@
 package com.assignment.todayweather.di
 
 import androidx.lifecycle.SavedStateHandle
+import com.assignment.todayweather.data.location.ForecastLocationService
 import com.assignment.todayweather.data.remote.RemoteDataImp
+import com.assignment.todayweather.domain.ILocationManager
 import com.assignment.todayweather.domain.IRemoteData
 import com.assignment.todayweather.domain.IRepository
 import com.assignment.todayweather.domain.interactors.GetDailyUseCase
+import com.assignment.todayweather.domain.interactors.GetLocationUseCase
+import com.assignment.todayweather.domain.interactors.SearchCityByLocationUseCase
 import com.assignment.todayweather.domain.interactors.SearchCityUseCase
 import com.assignment.todayweather.repository.RepositoryImp
 import com.assignment.todayweather.repository.model.mapper.ApiDetailUiMapper
@@ -23,11 +27,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 private val viewModelModule = module {
-    viewModel { MainViewModel(get(),get()) }
+    viewModel { MainViewModel(get(),get(),get(),get()) }
     viewModel { DetailViewModel(get(),get()) }
 
 }
 private val useCaseModule = module {
+    factory { GetLocationUseCase(get()) }
+    factory { SearchCityByLocationUseCase(get()) }
     factory { SearchCityUseCase(get()) }
     factory { GetDailyUseCase(get()) }
 }
@@ -37,6 +43,7 @@ private val mapModule = module {
 }
 private val commonModule = module {
     single { SavedStateHandle() }
+    single<ILocationManager> { ForecastLocationService(get()) }
     single<IRepository> { RepositoryImp(get(), get(),get()) }
     single<IRemoteData> { RemoteDataImp(get()) }
     single<Retrofit> {
